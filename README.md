@@ -42,9 +42,11 @@ CREATE DATABASE Taxi_Project;
 ```
 Create and populate a table called taxi_trips using cleaned NYC taxi data (June–Dec 2023).
 
-Make sure the following columns are present (simplified):
 
+Make sure the following columns are present (simplified):
+```bash
 pickup_date, pickup_time, pickup_borough, dropoff_borough, pickup_zone, trip_distance, fare_amount, tip_amount, total_amount, etc.
+```
 
 Update your database credentials in taxi_app.py:
 
@@ -63,22 +65,23 @@ conn = psycopg.connect(
 cd "/Users/nikitha/Desktop/Managing Data/Managing Data Project"
 ```
 
-2. (Optional) Create a virtual environment
+###3. (Optional) Create a virtual environment
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
-3. Install Python dependencies
+###4. Install Python dependencies
 If you don’t have a requirements.txt yet, use:
 ```bash
 pip install streamlit pandas plotly psycopg2-binary numpy scipy
 ```
+
 Or, if using a requirements.txt:
 ```bash
 pip install -r requirements.txt
 ```
 
-Launch the App
+###5. Launch the App
 Once inside your project folder, run:
 ```bash
 cd "/"
@@ -88,11 +91,11 @@ Your browser will open at:
 http://localhost:8501
 
 
-Sample Use Cases
-Discover best pickup zones by time/day
+#Sample Use Cases
+1. Discover best pickup zones by time/day
 
-Evaluate trip value before accepting passengers
+2. Evaluate trip value before accepting passengers
 
-Explore tip patterns and fare trends by borough
+3. Explore tip patterns and fare trends by borough
 
-Export filtered data for custom analysis
+4. Export filtered data for custom analysis
