@@ -65,12 +65,12 @@ conn = psycopg.connect(
 cd "/Users/nikitha/Desktop/Managing Data/Managing Data Project"
 ```
 
-###3. (Optional) Create a virtual environment
+### 3. (Optional) Create a virtual environment
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
-###4. Install Python dependencies
+### 4. Install Python dependencies
 If you don’t have a requirements.txt yet, use:
 ```bash
 pip install streamlit pandas plotly psycopg2-binary numpy scipy
@@ -81,7 +81,7 @@ Or, if using a requirements.txt:
 pip install -r requirements.txt
 ```
 
-###5. Launch the App
+### 5. Launch the App
 Once inside your project folder, run:
 ```bash
 cd "/"
@@ -90,8 +90,8 @@ streamlit run taxi_app.py
 Your browser will open at:
 http://localhost:8501
 
-
-#Sample Use Cases
+---
+# Sample Use Cases
 1. Discover best pickup zones by time/day
 
 2. Evaluate trip value before accepting passengers
