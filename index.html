@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Taxi & Events Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f7;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dashboard-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .dashboard-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .dropdown-select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .metrics-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .metric-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .metric-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-subtitle {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid #0066cc;
+            color: #0066cc;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+        }
+        
+        .calendar-month {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            padding: 5px;
+        }
+        
+        .calendar-day {
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+        
+        .calendar-day.selected {
+            background-color: #ffefd5;
+        }
+        
+        .events-list {
+            margin-top: 20px;
+        }
+        
+        .event-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .event-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .event-location {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .event-time {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .event-note {
+            font-size: 14px;
+            color: #0066cc;
+            margin-top: 10px;
+        }
+        
+        .pie-chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .map-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .toggle-buttons {
+            display: flex;
+            background-color: #333;
+            border-radius: 20px;
+            padding: 3px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        
+        .toggle-btn {
+            padding: 5px 15px;
+            border-radius: 18px;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .toggle-btn.active {
+            background-color: white;
+            color: #333;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-section">
+            <div class="dashboard-header">
+                <div>
+                    <div class="dashboard-title">NYC Taxi & Events Analysis</div>
+                    <div class="dashboard-subtitle">Interactive dashboard showing the relationship between NYC taxi demand and events</div>
+                </div>
+            </div>
+            
+            <!-- Overview Section -->
+            <div>
+                <div class="dashboard-title" style="font-size: 20px; margin-bottom: 10px;">Overview</div>
+                <div class="dashboard-subtitle">Key metrics from NYC taxi trips and events (June-Dec 2023)</div>
+                
+                <div class="tabs">
+                    <div class="tab active" id="taxi-tab">Taxi Data</div>
+                    <div class="tab" id="events-tab">Events Data</div>
+                </div>
+                
+                <div class="metrics-container">
+                    <div class="metric-box">
+                        <div class="metric-title">Total Trips</div>
+                        <div class="metric-value">1.2M</div>
+                        <div class="metric-subtitle">Jan-Dec 2023</div>
+                    </div>
+                    
+                    <div class="metric-box">
+                        <div class="metric-title">Avg. Daily Trips</div>
+                        <div class="metric-value">5,479</div>
+                        <div class="metric-subtitle">Per day</div>
+                    </div>
+                    
+                    <div class="metric-box">
+                        <div class="metric-title">Peak Borough</div>
+                        <div class="metric-value">Manhattan</div>
+                        <div class="metric-subtitle">Most trips</div>
+                    </div>
+                    
+                    <div class="metric-box">
+                        <div class="metric-title">Peak Day</div>
+                        <div class="metric-value">Dec 15</div>
+                        <div class="metric-subtitle">Highest demand</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Daily Taxi Trips Section -->
+            <div style="margin-top: 30px;">
+                <div class="dashboard-header">
+                    <div>
+                        <div class="dashboard-title" style="font-size: 20px;">Daily Taxi Trips</div>
+                        <div class="dashboard-subtitle">Daily taxi trip volume by month</div>
+                    </div>
+                    <select class="dropdown-select">
+                        <option selected>July 2023</option>
+                        <option>August 2023</option>
+                        <option>September 2023</option>
+                        <option>October 2023</option>
+                        <option>November 2023</option>
+                        <option>December 2023</option>
+                    </select>
+                </div>
+                
+                <div class="metrics-container">
+                    <div class="metric-box">
+                        <div class="metric-title">Total Trips</div>
+                        <div class="metric-value">88,000</div>
+                    </div>
+                    
+                    <div class="metric-box">
+                        <div class="metric-title">Average Daily</div>
+                        <div class="metric-value">5,867</div>
+                    </div>
+                    
+                    <div class="metric-box">
+                        <div class="metric-title">Peak Day</div>
+                        <div class="metric-value">6,200</div>
+                        <div class="metric-subtitle">Jul 4</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="dailyTripsChart"></canvas>
+                </div>
+                
+                <div style="display: flex; margin-bottom: 10px; align-items: center;">
+                    <div style="display: flex; align-items: center; margin-right: 20px;">
+                        <div style="width: 12px; height: 12px; background-color: #6c5ce7; margin-right: 5px;"></div>
+                        <span style="font-size: 14px;">Event day</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 12px; height: 12px; background-color: #a29bfe; margin-right: 5px;"></div>
+                        <span style="font-size: 14px;">Regular day</span>
+                    </div>
+                </div>
+                
+                <div style="font-size: 14px; color: #666;">2 major events in July 2023</div>
+            </div>
+            
+            <!-- Taxi Trips by Borough Section -->
+            <div style="margin-top: 30px;">
+                <div class="dashboard-title" style="font-size: 20px; margin-bottom: 10px;">Taxi Trips by Borough</div>
+                <div class="dashboard-subtitle">Distribution of taxi pickups across NYC boroughs</div>
+                
+                <div style="display: flex; margin-top: 20px;">
+                    <div style="flex: 1;">
+                        <div class="pie-chart-container">
+                            <canvas id="boroughChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #e74c3c;"></div>
+                        <span>Manhattan</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #e67e22;"></div>
+                        <span>Brooklyn</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f1c40f;"></div>
+                        <span>Queens</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ecf0f1;"></div>
+                        <span>Bronx</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #bdc3c7;"></div>
+                        <span>Staten Island</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- NYC Borough Map Section -->
+            <div style="margin-top: 30px;">
+                <div class="dashboard-header">
+                    <div>
+                        <div class="dashboard-title" style="font-size: 20px;">NYC Borough Map</div>
+                        <div class="dashboard-subtitle">Distribution of events by borough</div>
+                    </div>
+                    <div>
+                        <div class="toggle-buttons">
+                            <button class="toggle-btn active">Events</button>
+                            <button class="toggle-btn">Taxis</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <div class="dashboard-subtitle">Time Period</div>
+                    <select class="dropdown-select" style="margin-top: 5px; width: 100%;">
+                        <option selected>All Time (Jun-Dec 2023)</option>
+                        <option>June 2023</option>
+                        <option>July 2023</option>
+                        <option>August 2023</option>
+                        <option>September 2023</option>
+                        <option>October 2023</option>
+                        <option>November 2023</option>
+                        <option>December 2023</option>
+                    </select>
+                </div>
+                
+                <div class="map-container" style="margin-top: 20px;">
+                    <div>Loading map data...</div>
+                </div>
+            </div>
+            
+            <!-- Correlation Analysis Section -->
+            <div style="margin-top: 30px;">
+                <div class="dashboard-header">
+                    <div>
+                        <div class="dashboard-title" style="font-size: 20px;">Correlation Analysis</div>
+                        <div class="dashboard-subtitle">Relationship between NYC events and taxi demand</div>
+                    </div>
+                    <select class="dropdown-select">
+                        <option selected>All Time (Jun-Dec)</option>
+                        <option>Q2 2023</option>
+                        <option>Q3 2023</option>
+                        <option>Q4 2023</option>
+                    </select>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active">Time Series</div>
+                    <div class="tab">Lag Analysis</div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="correlationChart"></canvas>
+                </div>
+                
+                <div style="font-size: 14px; color: #666; margin-top: 10px;">
+                    The chart shows a positive correlation between the number of events and taxi trips during All Time (Jun-Dec 2023), particularly on holidays and special event days.
+                </div>
+            </div>
+            
+            <!-- Events Calendar Section -->
+            <div style="margin-top: 30px;">
+                <div class="dashboard-header">
+                    <div>
+                        <div class="dashboard-title" style="font-size: 20px;">Events Calendar</div>
+                        <div class="dashboard-subtitle">Calendar view of NYC permitted events</div>
+                    </div>
+                </div>
+                
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button style="background: none; border: none; font-size: 16px; cursor: pointer;">←</button>
+                        <div class="calendar-month">December 2023</div>
+                        <button style="background: none; border: none; font-size: 16px; cursor: pointer;">→</button>
+                    </div>
+                </div>
+                
+                <div class="calendar">
+                    <div class="calendar-day-header">Su</div>
+                    <div class="calendar-day-header">Mo</div>
+                    <div class="calendar-day-header">Tu</div>
+                    <div class="calendar-day-header">We</div>
+                    <div class="calendar-day-header">Th</div>
+                    <div class="calendar-day-header">Fr</div>
+                    <div class="calendar-day-header">Sa</div>
+                    
+                    <div class="calendar-day other-month">26</div>
+                    <div class="calendar-day other-month">27</div>
+                    <div class="calendar-day other-month">28</div>
+                    <div class="calendar-day other-month">29</div>
+                    <div class="calendar-day other-month">30</div>
+                    <div class="calendar-day">1</div>
+                    <div class="calendar-day">2</div>
+                    
+                    <div class="calendar-day">3</div>
+                    <div class="calendar-day">4</div>
+                    <div class="calendar-day">5</div>
+                    <div class="calendar-day">6</div>
+                    <div class="calendar-day">7</div>
+                    <div class="calendar-day">8</div>
+                    <div class="calendar-day">9</div>
+                    
+                    <div class="calendar-day">10</div>
+                    <div class="calendar-day">11</div>
+                    <div class="calendar-day">12</div>
+                    <div class="calendar-day">13</div>
+                    <div class="calendar-day selected">14</div>
+                    <div class="calendar-day">15</div>
+                    <div class="calendar-day">16</div>
+                    
+                    <div class="calendar-day">17</div>
+                    <div class="calendar-day">18</div>
+                    <div class="calendar-day">19</div>
+                    <div class="calendar-day">20</div>
+                    <div class="calendar-day">21</div>
+                    <div class="calendar-day">22</div>
+                    <div class="calendar-day">23</div>
+                    
+                    <div class="calendar-day">24</div>
+                    <div class="calendar-day">25</div>
+                    <div class="calendar-day">26</div>
+                    <div class="calendar-day">27</div>
+                    <div class="calendar-day">28</div>
+                    <div class="calendar-day">29</div>
+                    <div class="calendar-day">30</div>
+                    
+                    <div class="calendar-day">31</div>
+                    <div class="calendar-day other-month">1</div>
+                    <div class="calendar-day other-month">2</div>
+                    <div class="calendar-day other-month">3</div>
+                    <div class="calendar-day other-month">4</div>
+                    <div class="calendar-day other-month">5</div>
+                    <div class="calendar-day other-month">6</div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div style="font-weight: bold; font-size: 18px;">July 14, 2023</div>
+                    
+                    <div class="events-list">
+                        <div class="event-item">
+                            <div class="event-title">Street Fair</div>
+                            <div class="event-location">Manhattan</div>
+                            <div class="event-time">10:00 AM - 6:00 PM</div>
+                        </div>
+                        
+                        <div class="event-item">
+                            <div class="event-title">Music Festival</div>
+                            <div class="event-location">Brooklyn</div>
+                            <div class="event-time">4:00 PM - 10:00 PM</div>
+                            <div class="event-note">Taxi demand increased by 23% on this day</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Map Cache Status Section -->
+            <div style="margin-top: 30px;">
+                <div class="dashboard-header">
+                    <div style="display: flex; align-items: center;">
+                        <div style="margin-right: 10px;">📦</div>
+                        <div>
+                            <div class="dashboard-title" style="font-size: 20px;">Map Cache Status</div>
+                            <div class="dashboard-subtitle">Manage local caching of map data</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div>Cache Status:</div>
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 10px; height: 10px; border-radius: 50%; border: 1px solid #ccc; margin-right: 5px;"></div>
+                            Empty
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div>Last Updated:</div>
+                        <div>Never</div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div>Cache Size:</div>
+                        <div>0KB</div>
+                    </div>
+                    
+                    <button style="margin-top: 20px; padding: 8px 15px; background: none; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">Clear Map Cache</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Daily Trips Chart
+            const dailyTripsCtx = document.getElementById('dailyTripsChart').getContext('2d');
+            const dailyTripsChart = new Chart(dailyTripsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jul 1', 'Jul 2', 'Jul 3', 'Jul 4', 'Jul 5', 'Jul 6', 'Jul 7', 'Jul 8', 'Jul 9', 'Jul 10', 'Jul 11', 'Jul 12', 'Jul 13', 'Jul 14', 'Jul 15'],
+                    datasets: [{
+                        label: 'Taxi Trips',
+                        data: [5500, 5600, 5800, 6200, 5700, 5600, 5800, 5700, 5900, 5800, 5700, 5600, 5800, 5900, 6000],
+                        backgroundColor: function(context) {
+                            const index = context.dataIndex;
+                            return index === 3 || index === 13 ? '#6c5ce7' : '#a29bfe'; // Different color for Jul 4 and Jul 14
+                        },
+                        borderWidth: 0,
+                        borderRadius: 4,
+                        barPercentage: 0.8,
+                        categoryPercentage: 0.9
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: true,
+                                color: '#f0f0f0',
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: true,
+                                color: '#f0f0f0',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                stepSize: 750
+                            },
+                            min: 4000,
+                            max: 7000
+                        }
+                    }
+                }
+            });
+            
+            // Borough Chart
+            const boroughCtx = document.getElementById('boroughChart').getContext('2d');
+            const boroughChart = new Chart(boroughCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'],
+                    datasets: [{
+                        data: [65, 15, 12, 5, 3],
+                        backgroundColor: ['#e74c3c', '#e67e22', '#f1c40f', '#ecf0f1', '#bdc3c7'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Correlation Chart
+            const correlationCtx = document.getElementById('correlationChart').getContext('2d');
+            const correlationChart = new Chart(correlationCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jun 1', 'Jun 15', 'Jul 1', 'Jul 4', 'Jul 15', 'Aug 1', 'Aug 15', 'Sep 1', 'Sep 15', 'Oct 1', 'Oct 31', 'Nov 15', 'Nov 23', 'Dec 1', 'Dec 15', 'Dec 25'],
+                    datasets: [{
+                        label: 'Taxi Trips',
+                        data: [5100, 5400, 5700, 6500, 5800, 5500, 5300, 5400, 5500, 5400, 6200, 5600, 5800, 5600, 6700, 5900],
+                        borderColor: '#a29bfe',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#a29bfe',
+                        tension: 0.3,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Events',
+                        data: [12, 15, 23, 25, 20, 16, 14, 15, 15, 14, 22, 18, 21, 19, 25, 20],
+                        borderColor: '#82e0aa',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#82e0aa',
+                        tension: 0.3,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: true,
+                                color: '#f0f0f0',
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: {
+                                display: true,
+                                color: '#f0f0f0',
+                                drawBorder: false
+                            },
+                            min: 0,
+                            max: 8000,
+                            ticks: {
+                                stepSize: 2000
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                display: false
+                            },
+                            min: 0,
+                            max: 28,
+                            ticks: {
+                                stepSize: 7
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs in the same container
+                const tabContainer = tab.closest('.tabs');
+                tabContainer.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+            });
+        });
+        
+        // Calendar day selection
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', () => {
+                // Remove selected class from all days
+                document.querySelectorAll('.calendar-day').forEach(d => {
+                    d.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked day
+                day.classList.add('selected');
+            });
+        });
+        
+        // Toggle buttons functionality
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons in the same container
+                const btnContainer = btn.closest('.toggle-buttons');
+                btnContainer.querySelectorAll('.toggle-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
